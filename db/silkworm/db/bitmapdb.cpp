@@ -24,4 +24,51 @@ std::optional<uint64_t> seek_in_bitmap(roaring::Roaring64Map &bitmap, uint64_t c
     }
     return std::nullopt;
 }
+
+roaring::Roaring64Map cut_left(roaring::Roaring64Map *bm, uint64_t size_limit) {
+    if (bm->cardinality() == 0) return roaring::Roaring64Map();
+
+    if (bm->getSizeInBytes() <= size_limit) {
+        roaring::Roaring64Map res;
+        // Add range
+        uint64_t range_array[bm->maximum() - bm->minimum() + 1];
+        for (size_t i = bm->minimum(); i <= bm->maximum()+1; i++) {
+            range_array[i-bm->minimum()] = i;
+        }
+        res.addMany(bm->maximum() - bm->minimum() + 1, range_array);
+        res &= *bm;
+        res.runOptimize();
+        return res;
+    }
+    auto from{bm->minimum()};
+    auto min_max{bm->maximum() - bm->minimum()};
+
+    // We look for the cutting point
+	uint64_t to = 0;
+    uint64_t j = min_max;
+	while (true) {
+		uint64_t h = (to+j) >> 1;
+		roaring::Roaring64Map current_bm;
+        // add the range
+        uint64_t range_array[to - from + 1];
+        for (size_t i = from; i <= to+1; i++) {
+            range_array[i-from] = i;
+        }
+        current_bm.addMany(from - to + 1, range_array);
+		current_bm &= *bm;
+		current_bm.runOptimize();    
+		if (current_bm.getSizeInBytes() <= size_limit) {
+			to = h + 1;
+		} else {
+			j = h;
+		}
+        if (to > j) {
+            // remove range
+            for (uint64_t i = from; i <= to+1; i++) {
+                bm->remove(i);
+            }
+            return current_bm;
+        }
+	}
+}
 };  // namespace silkworm::db::bitmap

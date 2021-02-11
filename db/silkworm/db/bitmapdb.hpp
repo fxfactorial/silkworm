@@ -23,6 +23,8 @@
 namespace silkworm::db::bitmap {
 // Return value in bitmap that is higher than cap
 std::optional<uint64_t> seek_in_bitmap(roaring::Roaring64Map &bitmap, uint64_t cap);
+
+roaring::Roaring64Map cut_left(roaring::Roaring64Map *bitmap, uint64_t len);
 };  // namespace silkworm::bitmapdb
 
 #endif  // !SILKWORM_DB_BITMAPDB_H_

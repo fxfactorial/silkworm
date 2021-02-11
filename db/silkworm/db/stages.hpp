@@ -27,7 +27,7 @@ List of stages keys stored into SSP2 table
 
 namespace silkworm::db::stages {
 
-constexpr const char* kAccountHistoryKey{"AccountHistoryIndex"};
+constexpr const char* kAccountHistoryIndexKey{"AccountHistoryIndex"};
 constexpr const char* kBlockHashesKey{"BlockHashes"};
 constexpr const char* kBlockBodiesKey{"Bodies"};
 constexpr const char* kExecutionKey{"Execution"};

@@ -74,7 +74,7 @@ void run_collector_test(LoadFunc load_func) {
 
     // Check wheter load was performed as intended
     for (auto& entry : set) {
-        for (auto& transformed_entry : load_func(entry)) {
+        for (auto& transformed_entry : load_func(entry, nullptr)) {
             auto value{to->get(transformed_entry.key)};
             REQUIRE(value);
             CHECK(value->compare(transformed_entry.value) == 0);
@@ -85,10 +85,10 @@ void run_collector_test(LoadFunc load_func) {
 
 }
 
-TEST_CASE("collect_and_default_load") { run_collector_test(identity_load); }
+TEST_CASE("collect_and_default_load") { run_collector_test(nullptr); }
 
 TEST_CASE("collect_and_load") {
-    run_collector_test([](Entry entry) {
+    run_collector_test([](Entry entry, lmdb::Table *) {
         entry.key.at(0) = 1;
         return std::vector<Entry>({entry});
     });

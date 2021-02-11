@@ -31,7 +31,7 @@ namespace silkworm::etl {
 constexpr size_t kOptimalBufferSize = 256 * kMebi;
 
 // Function pointer to process Load on before Load data into tables
-typedef std::vector<Entry> (*LoadFunc)(Entry);
+typedef std::vector<Entry> (*LoadFunc)(Entry, lmdb::Table *);
 
 // Collects data Extracted from db
 class Collector {
@@ -79,9 +79,6 @@ class Collector {
     std::vector<std::unique_ptr<FileProvider>> file_providers_;
     size_t size_{0};
 };
-
-// Default no transform function
-std::vector<Entry> identity_load(Entry entry);
 
 }  // namespace silkworm::etl
 #endif  // !SILKWORM_ETL_COLLECTOR_H_

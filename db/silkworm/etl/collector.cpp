@@ -79,7 +79,7 @@ void Collector::load(silkworm::lmdb::Table* table, LoadFunc load_func, unsigned 
         buffer_.sort();
         if (load_func) {
             for (const auto& etl_entry : buffer_.get_entries()) {
-                auto trasformed_etl_entries{load_func(etl_entry)};
+                auto trasformed_etl_entries{load_func(etl_entry, table)};
                 for (const auto& transformed_etl_entry : trasformed_etl_entries) {
                     table->put(transformed_etl_entry.key, transformed_etl_entry.value, db_flags);
                 }
@@ -131,7 +131,7 @@ void Collector::load(silkworm::lmdb::Table* table, LoadFunc load_func, unsigned 
 
         // Process linked pairs
         if (load_func) {
-            for (const auto& transformed_etl_entry : load_func(etl_entry)) {
+            for (const auto& transformed_etl_entry : load_func(etl_entry, table)) {
                 table->put(transformed_etl_entry.key, transformed_etl_entry.value, db_flags);
             }
         } else {
@@ -183,7 +183,5 @@ std::string Collector::set_work_path(const char* provided_work_path) {
     fs::create_directories(p);
     return p.string();
 }
-
-std::vector<Entry> identity_load(Entry entry) { return std::vector<Entry>({entry}); }
 
 }  // namespace silkworm::etl
